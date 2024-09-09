@@ -16,7 +16,7 @@ const props = withDefaults(
   defineProps<
     | (CommonProps & {
         domain: string;
-        username: string;
+        userId: string;
       })
     | (CommonProps & {
         url: string;
@@ -37,27 +37,27 @@ const embedId = generateEmbedId();
 
 const getInfoFromUrl = () => {
   if (!('url' in props) || !URL.canParse(props.url)) {
-    return { domain: '', username: '' };
+    return { domain: '', userId: '' };
   }
   const urlObj = new URL(props.url);
   return {
     domain: urlObj.hostname,
-    username: (urlObj.pathname.split('/').pop() ?? '@').slice(1),
+    userId: (urlObj.pathname.split('/').pop() ?? '@').slice(1),
   };
 };
 
 const tinelineUrl = computed(() => {
   let domain = '';
-  let username = '';
+  let userId = '';
   if ('url' in props && props.url != null) {
-    const { domain: d, username: u } = getInfoFromUrl();
+    const { domain: d, userId: u } = getInfoFromUrl();
     domain = d;
-    username = u;
-  } else if ('domain' in props && 'username' in props) {
+    userId = u;
+  } else if ('domain' in props && 'userId' in props) {
     domain = props.domain;
-    username = props.username;
+    userId = props.userId;
   }
-  return `https://${domain}/embed/user-timeline/@${username}?header=${props.header}&autoload=${props.autoload}&maxHeight=${props.maxHeight}&border=${props.border}&rounded=${props.rounded}`;
+  return `https://${domain}/embed/user-timeline/${userId}?header=${props.header}&autoload=${props.autoload}&maxHeight=${props.maxHeight}&border=${props.border}&rounded=${props.rounded}`;
 });
 
 const scriptUrl = computed(() => {
@@ -78,7 +78,7 @@ const colorScheme = computed(() => {
   <iframe
     :src="tinelineUrl"
     :style="`border: none; width: 100%; max-width: 500px; height: 300px; color-scheme: ${colorScheme};`"
-    :misskey-embed-id="embedId"
+    :data-misskey-embed-id="embedId"
     :loading="loading"
   ></iframe>
   <component :is="'script'" :src="scriptUrl" defer></component>
